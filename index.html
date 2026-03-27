@@ -2,81 +2,47 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой профиль</title>
+    <title>TG Test</title>
 </head>
 <body>
-    <h1>👤 Мой профиль Telegram</h1>
-    <div id="profile"></div>
-    <div id="debug" style="margin-top: 20px; padding: 10px; background: #f0f0f0; font-size: 12px;"></div>
-
+    <h1>Telegram Mini App Test</h1>
+    <p id="status">Загрузка...</p>
+    
+    <!-- ⚠️ ЭТА СТРОКА БЫЛА ОТСУТСТВУЕТ! БЕЗ НЕЁ НИЧЕГО НЕ РАБОТАЕТ -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
     <script>
-        // Пишем всё, что происходит, в отладочный блок
-        const debug = document.getElementById('debug');
-        
-        function log(msg) {
-            debug.innerHTML += msg + '<br>';
-            console.log(msg);
-        }
-        
-        log('1. Скрипт запущен');
-        
-        // Проверяем, есть ли Telegram WebApp
-        if (window.Telegram) {
-            log('2. window.Telegram существует');
-        } else {
-            log('2. ❌ window.Telegram НЕ существует');
-        }
-        
-        if (window.Telegram && window.Telegram.WebApp) {
-            log('3. window.Telegram.WebApp существует');
-        } else {
-            log('3. ❌ window.Telegram.WebApp НЕ существует');
-        }
-        
-        const tg = window.Telegram?.WebApp;
-        
-        if (tg) {
-            log('4. tg получен');
-            tg.ready();
-            log('5. tg.ready() вызван');
+        // Ждём загрузки SDK
+        setTimeout(() => {
+            document.getElementById('status').innerHTML = 'Скрипт работает, проверяем Telegram...<br>';
             
-            // Проверяем initDataUnsafe
-            if (tg.initDataUnsafe) {
-                log('6. initDataUnsafe существует');
-                log('7. initDataUnsafe.user: ' + JSON.stringify(tg.initDataUnsafe.user));
+            // Проверяем, есть ли Telegram WebApp
+            if (typeof window.Telegram !== 'undefined') {
+                document.getElementById('status').innerHTML += '✅ window.Telegram найден!<br>';
+                if (window.Telegram.WebApp) {
+                    const tg = window.Telegram.WebApp;
+                    tg.ready();
+                    const user = tg.initDataUnsafe?.user;
+                    if (user) {
+                        document.getElementById('status').innerHTML += '✅ Данные пользователя: ' + user.first_name + ' (ID: ' + user.id + ')';
+                    } else {
+                        document.getElementById('status').innerHTML += '❌ Данные пользователя не получены';
+                    }
+                } else {
+                    document.getElementById('status').innerHTML += '❌ window.Telegram.WebApp не найден';
+                }
             } else {
-                log('6. ❌ initDataUnsafe НЕ существует');
+                document.getElementById('status').innerHTML = '❌ window.Telegram не найден<br>';
+                document.getElementById('status').innerHTML += 'Вы открыли приложение не через Telegram Mini App, а как обычный сайт.<br>';
+                document.getElementById('status').innerHTML += '<br><strong>Проверьте:</strong><br>';
+                document.getElementById('status').innerHTML += '1. Открываете через кнопку меню бота?<br>';
+                document.getElementById('status').innerHTML += '2. Ссылка в BotFather правильная?<br>';
+                document.getElementById('status').innerHTML += '3. GitHub Pages включён?';
             }
             
-            // Проверяем initData
-            if (tg.initData) {
-                log('8. initData есть, длина: ' + tg.initData.length);
-            } else {
-                log('8. ❌ initData отсутствует');
-            }
-            
-            const user = tg.initDataUnsafe?.user;
-            
-            if (user && user.id) {
-                log('9. ✅ Данные получены! ID: ' + user.id);
-                document.getElementById('profile').innerHTML = `
-                    <p><strong>✅ Успех!</strong></p>
-                    <p><strong>ID:</strong> ${user.id}</p>
-                    <p><strong>Имя:</strong> ${user.first_name}</p>
-                    <p><strong>Username:</strong> ${user.username ? '@' + user.username : 'нет'}</p>
-                    <p><strong>Premium:</strong> ${user.is_premium ? '✅ Да' : '❌ Нет'}</p>
-                    <p><strong>Язык:</strong> ${user.language_code}</p>
-                `;
-            } else {
-                log('9. ❌ Данные пользователя не получены');
-                document.getElementById('profile').innerHTML = '<p>❌ Данные профиля не получены</p>';
-            }
-        } else {
-            log('❌ tg не получен');
-            document.getElementById('profile').innerHTML = '<p>❌ Не удалось подключиться к Telegram. Запусти через бота.</p>';
-        }
+            // Дополнительно: показываем текущий URL
+            document.getElementById('status').innerHTML += '<br><br>📎 Текущий URL: ' + window.location.href;
+        }, 200);
     </script>
 </body>
 </html>
-<!-- обновление 1 -->
